@@ -48,6 +48,47 @@
             #binding-cells = <0>;
             mods = <(MOD_LSFT)>;
         };
+
+        /* Graphite (2023) custom shift pairs */
+        apos_und: apos_und {
+            compatible = "zmk,behavior-mod-morph";
+            bindings = <&kp SQT>, <&kp UNDERSCORE>;
+
+            #binding-cells = <0>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        comma_qmark: comma_qmark {
+            compatible = "zmk,behavior-mod-morph";
+            bindings = <&kp COMMA>, <&kp QMARK>;
+
+            #binding-cells = <0>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        dot_gt: dot_gt {
+            compatible = "zmk,behavior-mod-morph";
+            bindings = <&kp PERIOD>, <&kp GREATER_THAN>;
+
+            #binding-cells = <0>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        minus_dquo: minus_dquo {
+            compatible = "zmk,behavior-mod-morph";
+            bindings = <&kp MINUS>, <&kp DOUBLE_QUOTES>;
+
+            #binding-cells = <0>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        slash_lt: slash_lt {
+            compatible = "zmk,behavior-mod-morph";
+            bindings = <&kp FSLH>, <&kp LESS_THAN>;
+
+            #binding-cells = <0>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
     };
 
     macros {
@@ -67,92 +108,9 @@
     combos {
         compatible = "zmk,combos";
 
-        escape {
-            bindings = <&kp ESCAPE>;
-            key-positions = <13 29>;
-        };
-
         delete {
             bindings = <&kp DELETE>;
             key-positions = <15 21>;
-        };
-
-        perc {
-            bindings = <&kp PERCENT>;
-            key-positions = <5 17>;
-            layers = <0>;
-        };
-
-        equal {
-            bindings = <&kp EQUAL>;
-            key-positions = <28 16>;
-            layers = <0>;
-        };
-
-        dollar {
-            bindings = <&kp DOLLAR>;
-            key-positions = <4 16>;
-            layers = <0>;
-        };
-
-        pound {
-            bindings = <&kp POUND>;
-            key-positions = <3 15>;
-            layers = <0>;
-        };
-
-        at {
-            bindings = <&kp AT>;
-            key-positions = <2 14>;
-            layers = <0>;
-        };
-
-        backslash {
-            bindings = <&kp BACKSLASH>;
-            key-positions = <26 14>;
-            layers = <0>;
-        };
-
-        star {
-            bindings = <&kp STAR>;
-            key-positions = <8 20>;
-            layers = <0>;
-        };
-
-        slash {
-            bindings = <&kp SLASH>;
-            key-positions = <32 20>;
-            layers = <0>;
-        };
-
-        plus {
-            bindings = <&kp PLUS>;
-            key-positions = <7 19>;
-            layers = <0>;
-        };
-
-        minus {
-            bindings = <&kp KP_MINUS>;
-            key-positions = <31 19>;
-            layers = <0>;
-        };
-
-        underscore {
-            bindings = <&kp UNDER>;
-            key-positions = <30 18>;
-            layers = <0>;
-        };
-
-        leftbrack {
-            bindings = <&kp LEFT_BRACKET>;
-            key-positions = <31 32>;
-            layers = <0>;
-        };
-
-        rightbrack {
-            bindings = <&kp RIGHT_BRACKET>;
-            key-positions = <33 32>;
-            layers = <0>;
         };
 
         para-less {
@@ -176,17 +134,18 @@
         DEF {
             display-name = "Base";
 
+            // Graphite (2023) + home-row mods (hold: Win/Alt/Ctrl/Shift) + Graphite shift pairs
             // -----------------------------------------------------------------------------------------
-            // |  Q  |  W  |  E  |  R  |  T  |   |  Y  |  U   |  I  |  O  |  P  |
-            // |  A  |  S  |  D  |  F  |  G  |   |  H  |  J   |  K  |  L  |  ;  |
-            // |  Z  |  X  |  C  |  V  |  B  |   |  N  |  M   |  ,  |  .  |  /  |
-            // | GUI | CTRL | SHFT | LWR | SPC |   | ENT | RSE  | BKSP | ALT | ESC |
+            // | TAB |  B  |  L  |  D  |  W  |  Z  |   | '(_) |  F  |  O  |  U  |  J  | BKSP  |
+            // | ESC |  N  |  R  |  T  |  S  |  G  |   |  Y   |  H  |  A  |  E  |  I  | ,(?)  |
+            // | REP |  Q  |  X  |  M  |  C  |  V  |   |  K   |  P  | .(>)| -(")| /(<)| EXTRA |
+            //                   | GUI | NAV | SPC |   | ENT  | SYM | ALT |
 
             bindings = <
-&kp TAB    &kp B  &kp L  &kp D     &kp W  &kp Z        &kp SQT  &kp F      &kp O         &kp U      &kp J     &kp BACKSPACE
-&kp LSHFT  &kp N  &kp R  &kp T     &kp S  &kp G        &kp Y    &kp H      &kp A         &kp E      &kp I     &kp COMMA
-&kp LCTRL  &kp Q  &kp X  &kp M     &kp C  &kp V        &kp K    &kp P      &kp PERIOD    &kp MINUS  &kp FSLH  &mo 4
-                         &kp LGUI  &mo 1  &kp SPACE    &kp RET  &lt 2 TAB  &kp LEFT_ALT
+&kp TAB      &kp B         &kp L         &kp D          &kp W          &kp Z        &apos_und  &kp F          &kp O          &kp U         &kp J         &kp BACKSPACE
+&kp ESCAPE   &hm LGUI N    &hm LALT R    &hm LCTRL T    &hm LSHFT S    &kp G        &kp Y      &hm RSHFT H    &hm RCTRL A    &hm LALT E    &hm RGUI I    &comma_qmark
+&key_repeat  &kp Q         &kp X         &kp M          &kp C          &kp V        &kp K      &kp P          &dot_gt        &minus_dquo   &slash_lt     &mo 4
+                                         &kp LGUI       &mo 1          &kp SPACE    &kp RET    &lt 2 TAB      &kp LEFT_ALT
             >;
         };
 
@@ -201,7 +160,7 @@
 
             bindings = <
 &trans      &kp N1  &kp N2  &kp N3    &kp N4       &kp N5           &kp N6   &kp N7    &kp N8    &kp N9        &kp N0     &trans
-&caps_word  &trans  &trans  &trans    &browsertab  &kp PAGE_UP      &trans   &kp LEFT  &kp DOWN  &kp UP_ARROW  &kp RIGHT  &trans
+&caps  &trans  &trans  &trans    &browsertab  &kp PAGE_UP      &trans   &kp LEFT  &kp DOWN  &kp UP_ARROW  &kp RIGHT  &trans
 &trans      &trans  &trans  &trans    &trans       &kp PAGE_DOWN    &trans   &trans    &trans    &trans        &trans     &trans
                             &kp LGUI  &trans       &kp SPACE        &kp RET  &mo 3     &trans
             >;
