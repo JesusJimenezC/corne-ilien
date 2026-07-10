@@ -76,7 +76,8 @@ void draw_profile_status(lv_obj_t *canvas, const struct status_state *state) {
             lv_draw_rect_dsc_init(&rect_dsc);
             rect_dsc.bg_opa = LV_OPA_TRANSP;
             rect_dsc.border_color = LVGL_FOREGROUND;
-            rect_dsc.border_width = 1;
+            rect_dsc.border_width = 2;
+            rect_dsc.radius = 3;
             lv_canvas_draw_rect(canvas, x, OFFSET_Y, 12, 12, &rect_dsc);
 
             if (selected) {
