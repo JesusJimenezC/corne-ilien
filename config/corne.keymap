@@ -102,22 +102,6 @@
         };
     };
 
-    combos {
-        compatible = "zmk,combos";
-
-        /* The combo sits on a high-frequency English bigram (te/et);
-           require-prior-idle-ms keeps it from firing mid-word during fast rolls.
-           The former ( / ) combos on H+A / A+E were removed: they misfired on
-           ha/ah/ae/ea word starts ("hae" -> "()"); parens live on SYM. */
-        delete {
-            bindings = <&kp DELETE>;
-            key-positions = <15 21>;
-            require-prior-idle-ms = <150>;
-        };
-    };
-
-    //
-
     keymap {
         compatible = "zmk,keymap";
 
@@ -195,13 +179,13 @@
 
             // -----------------------------------------------------------------------------------------
             // |     |     | MUTE| VOL-| VOL+|     |   |     |     |     |     |     |      |
-            // |     | C-A | C-C | C-V | C-X |     |   |     |     |     |     |     |      |
+            // |     |     |     |     |     |     |   |     |     |     |     |     |      |
             // |     |     |     |     |     |     |   |     |     |     |     |     |(held)|
             //                   |     |     |     |   |     |     |     |
 
             bindings = <
 &trans  &trans     &kp K_MUTE  &kp C_VOLUME_DOWN  &kp C_VOLUME_UP  &trans    &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &kp LC(A)  &kp LC(C)   &kp LC(V)          &kp LC(X)        &trans    &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans     &trans      &trans             &trans           &trans    &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans     &trans      &trans             &trans           &trans    &trans  &trans  &trans  &trans  &trans  &trans
                                &trans             &trans           &trans    &trans  &trans  &trans
             >;
