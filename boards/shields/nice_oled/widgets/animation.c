@@ -125,8 +125,6 @@ LV_IMG_DECLARE(pbongo_3);
 LV_IMG_DECLARE(pbongo_4);
 LV_IMG_DECLARE(pbongo_5);
 LV_IMG_DECLARE(pbongo_6);
-LV_IMG_DECLARE(luffy_poster);
-LV_IMG_DECLARE(luffy_skull);
 
 static const lv_img_dsc_t *rot_head_imgs[] = {
     &head_00, &head_01, &head_02, &head_03, &head_04, &head_05, &head_06, &head_07,
@@ -146,8 +144,6 @@ static const lv_img_dsc_t *rot_spaceman_imgs[] = {
     &spaceman_15, &spaceman_16, &spaceman_17, &spaceman_18, &spaceman_19};
 static const lv_img_dsc_t *rot_pbongo_imgs[] = {&pbongo_0, &pbongo_1, &pbongo_2, &pbongo_3,
                                                 &pbongo_4, &pbongo_5, &pbongo_6};
-static const lv_img_dsc_t *rot_luffy_imgs[] = {&luffy_poster};
-static const lv_img_dsc_t *rot_skull_imgs[] = {&luffy_skull};
 
 struct panim_entry {
     const lv_img_dsc_t **imgs;
@@ -161,8 +157,6 @@ static const struct panim_entry panim_entries[] = {
     {rot_pokemon_imgs, 48, 10000},  /* pokemon parade */
     {rot_spaceman_imgs, 20, 4800},  /* spaceman */
     {rot_pbongo_imgs, 7, 1200},     /* bongo cat */
-    {rot_luffy_imgs, 1, 10000},     /* luffy wanted poster (static) */
-    {rot_skull_imgs, 1, 10000},     /* one piece jolly roger skull (static) */
 };
 
 static uint32_t panim_idx;
