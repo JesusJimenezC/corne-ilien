@@ -147,8 +147,13 @@ config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SPACEMAN
     bool "Enable spaceman animation on peripheral"
     default n
 
+config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_WARHAMMER
+    bool "Enable warhammer 40k aquila/space-marine slideshow on peripheral"
+    default n
+
 config NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_MS
     int "Animation length in milliseconds"
+    default 8000 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_WARHAMMER
     default 10000 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_POKEMON
     default 4800 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_HEAD
     default 4800 if NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SPACEMAN

@@ -50,6 +50,12 @@ const lv_img_dsc_t *head_imgs[] = {&head_00, &head_01, &head_02, &head_03, &head
                                    &head_06, &head_07, &head_08, &head_09, &head_10, &head_11,
                                    &head_12, &head_13, &head_14, &head_15};
 
+#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_WARHAMMER)
+LV_IMG_DECLARE(warhammer_aquila);
+LV_IMG_DECLARE(warhammer_marine);
+
+const lv_img_dsc_t *warhammer_imgs[] = {&warhammer_aquila, &warhammer_marine};
+
 #elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_CAT)
 LV_IMG_DECLARE(cat_0);
 LV_IMG_DECLARE(cat_1);
@@ -180,6 +186,8 @@ void draw_animation(lv_obj_t *canvas, struct zmk_widget_screen *widget) {
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_HEAD)
     lv_animimg_set_src(art, (const void **)head_imgs, 16);
+#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_WARHAMMER)
+    lv_animimg_set_src(art, (const void **)warhammer_imgs, 2);
 #elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_CAT)
     lv_animimg_set_src(art, (const void **)cat_imgs, 8);
 #elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_ANIMATION_PERIPHERAL_SPACEMAN)
