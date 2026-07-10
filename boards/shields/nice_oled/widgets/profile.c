@@ -1,4 +1,5 @@
 #include <zephyr/kernel.h>
+#include <zmk/ble.h>
 #include "profile.h"
 #if !IS_ENABLED(CONFIG_NICE_EPAPER_ON)
 // use custom_fonts.h only for the draw_active_profile_text function
@@ -56,9 +57,35 @@ void draw_profile_status(lv_obj_t *canvas, const struct status_state *state) {
     lv_draw_img_dsc_t img_dsc;
     lv_draw_img_dsc_init(&img_dsc);
 
+    // Per-slot BT profile status:
+    //   selected + bonded     -> filled marker (profile_active image)
+    //   selected + not bonded -> hollow square (solid border)
+    //   idle + bonded         -> solid line
+    //   idle + not bonded     -> dotted line
     for (int i = 0; i < 5; i++) {
-        lv_canvas_draw_img(canvas, OFFSET_X + (i * 14), OFFSET_Y,
-                           i == state->active_profile_index ? &profile_active : &profile, &img_dsc);
+        int x = OFFSET_X + (i * 14);
+        bool selected = (i == state->active_profile_index);
+        bool bonded = !zmk_ble_profile_is_open(i);
+
+        if (selected && bonded) {
+            lv_canvas_draw_img(canvas, x, OFFSET_Y, &profile_active, &img_dsc);
+        } else if (selected) {
+            lv_draw_rect_dsc_t rect_dsc;
+            lv_draw_rect_dsc_init(&rect_dsc);
+            rect_dsc.bg_opa = LV_OPA_TRANSP;
+            rect_dsc.border_color = LVGL_FOREGROUND;
+            rect_dsc.border_width = 2;
+            lv_canvas_draw_rect(canvas, x, OFFSET_Y, 12, 12, &rect_dsc);
+        } else {
+            lv_draw_line_dsc_t line_dsc;
+            init_line_dsc(&line_dsc, LVGL_FOREGROUND, 2);
+            if (!bonded) {
+                line_dsc.dash_width = 2;
+                line_dsc.dash_gap = 2;
+            }
+            lv_point_t points[2] = {{x, OFFSET_Y + 6}, {x + 12, OFFSET_Y + 6}};
+            lv_canvas_draw_line(canvas, points, 2, &line_dsc);
+        }
     }
 #else
     draw_inactive_profiles(canvas, state);
