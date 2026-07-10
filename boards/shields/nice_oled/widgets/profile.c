@@ -57,11 +57,11 @@ void draw_profile_status(lv_obj_t *canvas, const struct status_state *state) {
     lv_draw_img_dsc_t img_dsc;
     lv_draw_img_dsc_init(&img_dsc);
 
-    // Per-slot BT profile status:
-    //   selected + bonded     -> filled marker (profile_active image)
-    //   selected + not bonded -> hollow square (solid border)
-    //   idle + bonded         -> solid line
-    //   idle + not bonded     -> dotted line
+    // Per-slot BT profile status, all rendered as 12x12 squares:
+    //   selected + bonded     -> filled marker (profile_active image, unchanged)
+    //   selected + not bonded -> solid-border square with a center dot
+    //   idle + bonded         -> solid-border square
+    //   idle + not bonded     -> dotted-border marker (original profile image)
     for (int i = 0; i < 5; i++) {
         int x = OFFSET_X + (i * 14);
         bool selected = (i == state->active_profile_index);
@@ -69,22 +69,21 @@ void draw_profile_status(lv_obj_t *canvas, const struct status_state *state) {
 
         if (selected && bonded) {
             lv_canvas_draw_img(canvas, x, OFFSET_Y, &profile_active, &img_dsc);
-        } else if (selected) {
+        } else if (!selected && !bonded) {
+            lv_canvas_draw_img(canvas, x, OFFSET_Y, &profile, &img_dsc);
+        } else {
             lv_draw_rect_dsc_t rect_dsc;
             lv_draw_rect_dsc_init(&rect_dsc);
             rect_dsc.bg_opa = LV_OPA_TRANSP;
             rect_dsc.border_color = LVGL_FOREGROUND;
-            rect_dsc.border_width = 2;
+            rect_dsc.border_width = 1;
             lv_canvas_draw_rect(canvas, x, OFFSET_Y, 12, 12, &rect_dsc);
-        } else {
-            lv_draw_line_dsc_t line_dsc;
-            init_line_dsc(&line_dsc, LVGL_FOREGROUND, 2);
-            if (!bonded) {
-                line_dsc.dash_width = 2;
-                line_dsc.dash_gap = 2;
+
+            if (selected) {
+                lv_draw_rect_dsc_t dot_dsc;
+                init_rect_dsc(&dot_dsc, LVGL_FOREGROUND);
+                lv_canvas_draw_rect(canvas, x + 4, OFFSET_Y + 4, 4, 4, &dot_dsc);
             }
-            lv_point_t points[2] = {{x, OFFSET_Y + 6}, {x + 12, OFFSET_Y + 6}};
-            lv_canvas_draw_line(canvas, points, 2, &line_dsc);
         }
     }
 #else
