@@ -38,7 +38,7 @@ const lv_img_dsc_t *hid_anim_imgs[] = {&dog_bark1_90, &dog_bark2_90};
 #endif
 
 #if HID_HAS_ANIMATION
-static lv_obj_t *hid_anim = NULL; // Variable estática para almacenar el objeto animado
+static lv_obj_t *hid_anim = NULL; // Static variable holding the animated object
 #endif
 
 struct hid_indicators_state {
@@ -55,8 +55,8 @@ static void set_hid_indicators(lv_obj_t *label, struct hid_indicators_state stat
 #define SET_HID_INDICATORS_MS 300
 #endif
 
-    // Construir el texto según los indicadores activos.
-    // Se agregan las letras correspondientes si cada indicador está activo.
+    // Build the text according to the active indicators.
+    // The corresponding letters are added if each indicator is active.
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_LUNA_ONLY_CAPSLOCK) ||                       \
     IS_ENABLED(CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_BONGO_CAT_ONLY_CAPSLOCK)
@@ -66,7 +66,7 @@ static void set_hid_indicators(lv_obj_t *label, struct hid_indicators_state stat
 #endif
     {
         lv_label_set_text(label, "");
-        if (!hid_anim) { // Si no existe aún, creamos la animación
+        if (!hid_anim) { // If it doesn't exist yet, create the animation
 
             hid_anim = lv_animimg_create(label);
             lv_obj_center(hid_anim);
@@ -80,7 +80,7 @@ static void set_hid_indicators(lv_obj_t *label, struct hid_indicators_state stat
                          CONFIG_NICE_OLED_WIDGET_HID_INDICATORS_CUSTOM_Y);
         }
     } else {
-        // Si LED_CLCK no está activo, y se había creado la animación, la eliminamos
+        // If LED_CLCK is not active and the animation was created, remove it
         if (hid_anim) {
             lv_obj_del(hid_anim);
             hid_anim = NULL;

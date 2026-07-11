@@ -12,7 +12,7 @@ static lv_obj_t *weather_label;
 
 void update_weather_widget_label(int8_t temperature) {
     if (weather_label != NULL) {
-        if (temperature == 127) { // Valor especial para N/A
+        if (temperature == 127) { // Special value for N/A
             lv_label_set_text(weather_label, "N/A");
         } else {
             lv_label_set_text_fmt(weather_label, "%d C", temperature);

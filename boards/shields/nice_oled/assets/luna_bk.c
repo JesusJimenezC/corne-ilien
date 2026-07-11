@@ -29,13 +29,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-- se lee 32x22 en vertical originalmente, entonces se tiene que convertir a horizontal!!!
-- para la pantalla oled standard de ZMK se tiene que girar a 90 grados cuando no se usa la funcion
-de rotar imagenes
-- 1. uso la pagina de joric para generar las imagenes
-  2. la imagene decargada se voltea a 90 grados en el telefono sin perder calidad (iphone)
-  3. subo la imagen a javl y: Output -> Arduino code, single bitmap -> Horizontal - 1 bit per pixel
-  4. copiar y pegar el cogido aqui, no olvides escribir las medidas w = 32 h = 22 (por ejemplo)
+- originally read as 32x22 vertical, so it has to be converted to horizontal!!!
+- for the standard ZMK oled screen it has to be rotated 90 degrees when the image
+rotation function is not used
+- 1. I use joric's page to generate the images
+  2. the downloaded image is rotated 90 degrees on the phone without losing quality (iphone)
+  3. I upload the image to javl and: Output -> Arduino code, single bitmap -> Horizontal - 1 bit per pixel
+  4. copy and paste the code here, don't forget to write the dimensions w = 32 h = 22 (for example)
 - https://joric.github.io/qle/
 - https://javl.github.io/image2cpp/
 
@@ -124,7 +124,7 @@ const unsigned char epd_bitmap_ [] PROGMEM = {
 // END 90
 
 
-// TODO: hasta aqui logre hacer esto
+// TODO: this is as far as I got
 // START 270
 const unsigned char epd_bitmap_ [] PROGMEM = {
         // 'dog_bark1, 24x32px
@@ -390,20 +390,20 @@ const unsigned char epd_bitmap_ [] PROGMEM = {
 #endif
 
 /*
- * Definiciones de datos de imagen para cada frame de la animación del perro.
- * Las imágenes son monocromo (1 bit) y se asume un palette de dos colores.
- * Inserta en cada array los bytes reales de tu imagen.
+ * Image data definitions for each frame of the dog animation.
+ * The images are monochrome (1 bit) and a two-color palette is assumed.
+ * Insert the real bytes of your image into each array.
  */
 
 /* DOG SIT1 */
 const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_DOG_SIT1 uint8_t
     dog_sit1_map[] = {
 #if CONFIG_NICE_OLED_WIDGET_INVERTED
-        0x00, 0x00, 0x00, 0xff, /* Color de índice 0 */
-        0xff, 0xff, 0xff, 0xff, /* Color de índice 1 */
+        0x00, 0x00, 0x00, 0xff, /* Index 0 color */
+        0xff, 0xff, 0xff, 0xff, /* Index 1 color */
 #else
-        0xff, 0xff, 0xff, 0xff, /* Color de índice 0 */
-        0x00, 0x00, 0x00, 0xff, /* Color de índice 1 */
+        0xff, 0xff, 0xff, 0xff, /* Index 0 color */
+        0x00, 0x00, 0x00, 0xff, /* Index 1 color */
 #endif
 
 #if CONFIG_NICE_OLED_WIDGET_LUNA_VERTICAL_READ
@@ -773,8 +773,8 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_DOG_BARK2
 };
 
 /*
- * Definiciones de los descriptores de imagen (lv_img_dsc_t) para cada frame.
- * Se utilizan imágenes monocromáticas (1 bit).
+ * Image descriptor definitions (lv_img_dsc_t) for each frame.
+ * Monochrome (1-bit) images are used.
  */
 
 /* Descriptor: Dog Sit1 */
@@ -782,8 +782,8 @@ const lv_img_dsc_t dog_sit1 = {
     .header.cf = LV_IMG_CF_INDEXED_1BIT,
     .header.always_zero = 0,
     .header.reserved = 0,
-    .header.w = 32, /* Ancho de la imagen */
-    .header.h = 22, /* Alto de la imagen */
+    .header.w = 32, /* Image width */
+    .header.h = 22, /* Image height */
     .data_size = sizeof(dog_sit1_map),
     .data = dog_sit1_map,
 };

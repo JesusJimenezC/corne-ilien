@@ -28,9 +28,9 @@ struct status_state {
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_CENTRAL_SHOW_BATTERY_PERIPHERAL_ALL) ||                     \
     IS_ENABLED(CONFIG_NICE_OLED_WIDGET_CENTRAL_SHOW_BATTERY_PERIPHERAL_ONLY) ||                    \
     IS_ENABLED(CONFIG_NICE_OLED_WIDGET_CENTRAL_SHOW_BATTERY_PERIPHERAL_AND_CENTRAL)
-// Calcula el número total de dispositivos (central + periféricos)
+// Compute the total number of devices (central + peripherals)
 #define CONFIG_NICE_OLED_SPLIT_TOTAL_DEVICES (1 + CONFIG_ZMK_SPLIT_BLE_CENTRAL_PERIPHERALS)
-    // Usa la macro para definir el tamaño del array
+    // Use the macro to define the array size
     struct battery_info batteries[CONFIG_NICE_OLED_SPLIT_TOTAL_DEVICES];
 #endif
 

@@ -9,7 +9,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 ZMK_EVENT_IMPL(is_connected_notification);
 ZMK_EVENT_IMPL(time_notification);
 ZMK_EVENT_IMPL(volume_notification);
-ZMK_EVENT_IMPL(weather_notification); // NUEVO
+ZMK_EVENT_IMPL(weather_notification); // NEW
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS)
 ZMK_EVENT_IMPL(spotify_notification);
 #endif
@@ -21,7 +21,7 @@ typedef enum {
     _TIME = 0xAA, // random value, must match companion app
     _VOLUME,
     _LAYOUT,
-    _WEATHER = 0xAF, // NUEVO
+    _WEATHER = 0xAF, // NEW
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS)
     _SPOTIFY = 0xAE,
 #endif
@@ -85,7 +85,7 @@ static void process_raw_hid_data(uint8_t *data) {
         break;
 #endif
 
-    // --- NUEVO: Caso para Clima ---
+    // --- NEW: weather case ---
     case _WEATHER:
         raise_weather_notification((struct weather_notification){.temperature = (int8_t)data[1]});
         break;

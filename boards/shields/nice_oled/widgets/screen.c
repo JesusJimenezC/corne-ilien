@@ -55,45 +55,45 @@ struct battery_state {
     bool usb_present;
 };
 /**
- * @brief Dibuja el estado de la batería como texto "CENTRAL - PERIPHERAL".
+ * @brief Draws the battery state as "CENTRAL - PERIPHERAL" text.
  *
- * Esta función toma el estado de la batería del central y del periférico
- * y lo muestra como una cadena de texto simple en las coordenadas especificadas.
+ * Takes the central and peripheral battery state and shows it
+ * as a simple text string at the specified coordinates.
  */
 static void draw_battery_text(lv_obj_t *canvas, const struct status_state *state) {
-    // Un buffer de texto más grande para manejar múltiples baterías
+    // A larger text buffer to handle multiple batteries
     char text[32] = "";
     lv_draw_label_dsc_t label_dsc;
 
-    // Inicialización de la fuente y el estilo del texto
+    // Font and text style initialization
 #if IS_ENABLED(CONFIG_NICE_EPAPER_ON)
     init_label_dsc(&label_dsc, LVGL_FOREGROUND, &pixel_operator_mono_16, LV_TEXT_ALIGN_LEFT);
 #else
     init_label_dsc(&label_dsc, LVGL_FOREGROUND, &lv_font_unscii_8, LV_TEXT_ALIGN_LEFT);
 #endif
 
-    //  Lógica Parcelada
+    //  Mode-specific logic
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_CENTRAL_SHOW_BATTERY_PERIPHERAL_ALL)
-    // MODO 1: Muestra TODAS las baterías (Central + Periféricos) en una sola linea
+    // MODE 1: Show ALL batteries (central + peripherals) on a single line
     char *p = text;
     char *end = text + sizeof(text);
     for (int i = 0; i < CONFIG_NICE_OLED_SPLIT_TOTAL_DEVICES; i++) {
-        // Añade el nivel de la batería y un espacio, controlando el tamaño del buffer
+        // Append the battery level and a space, respecting the buffer size
         int written = snprintf(p, end - p, "%d ", state->batteries[i].level);
         if (written > 0) {
             p += written;
         }
     }
-    // Elimina el último espacio si se escribió algo
+    // Remove the trailing space if anything was written
     if (p > text) {
         *(p - 1) = '\0';
     }
 
 #elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_CENTRAL_SHOW_BATTERY_PERIPHERAL_ONLY)
-    // MODO 2: Muestra SÓLO las baterías de los periféricos
+    // MODE 2: Show ONLY the peripheral batteries
     char *p = text;
     char *end = text + sizeof(text);
-    // El bucle empieza en 1 para saltarse la batería central (índice 0)
+    // Loop starts at 1 to skip the central battery (index 0)
     for (int i = 1; i < CONFIG_NICE_OLED_SPLIT_TOTAL_DEVICES; i++) {
         int written = snprintf(p, end - p, "%d  ", state->batteries[i].level);
         if (written > 0) {
@@ -105,43 +105,43 @@ static void draw_battery_text(lv_obj_t *canvas, const struct status_state *state
     }
 
 #elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_CENTRAL_SHOW_BATTERY_PERIPHERAL_AND_CENTRAL)
-    // MODO 3: Muestra la batería central y la del PRIMER periférico
+    // MODE 3: Show the central battery and the FIRST peripheral's
     if (CONFIG_NICE_OLED_SPLIT_TOTAL_DEVICES >= 2) {
         snprintf(text, sizeof(text), "%d  %d", state->batteries[0].level,
                  state->batteries[1].level);
     } else {
-        // Si no hay periférico, muestra solo la central
+        // If there is no peripheral, show only the central one
         snprintf(text, sizeof(text), "%d", state->batteries[0].level);
     }
 #endif
 
-    // Dibuja la cadena de texto final en la pantalla
+    // Draw the final text string on the screen
     lv_canvas_draw_text(canvas, 0, 19, lv_obj_get_width(canvas), &label_dsc, text);
 }
 /*
 static void draw_battery_text(lv_obj_t *canvas, const struct status_state *state) {
     lv_draw_label_dsc_t label_dsc;
 
-    // Inicialización de la fuente y el estilo del texto
+    // Font and text style initialization
 #if IS_ENABLED(CONFIG_NICE_EPAPER_ON)
     init_label_dsc(&label_dsc, LVGL_FOREGROUND, &pixel_operator_mono_16, LV_TEXT_ALIGN_LEFT);
 #else
     init_label_dsc(&label_dsc, LVGL_FOREGROUND, &lv_font_unscii_8, LV_TEXT_ALIGN_LEFT);
 #endif
 
-    //  Lógica Parcelada
+    //  Mode-specific logic
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_CENTRAL_SHOW_BATTERY_PERIPHERAL_ALL)
-    // MODO 1: Muestra TODAS las baterías, en dos líneas separadas.
+    // MODE 1: Show ALL batteries, on two separate lines.
 
-    //  Batería Central
+    //  Central battery
     char central_text[8];
-    memset(central_text, 0, sizeof(central_text)); // Limpia el búfer
+    memset(central_text, 0, sizeof(central_text)); // Clear the buffer
     snprintf(central_text, sizeof(central_text), "%d", state->batteries[0].level);
     lv_canvas_draw_text(canvas, 0, 1, 25, &label_dsc, central_text);
 
-    //  Baterías Periféricas
+    //  Peripheral batteries
     char peripheral_text[32];
-    memset(peripheral_text, 0, sizeof(peripheral_text)); // Limpia el búfer
+    memset(peripheral_text, 0, sizeof(peripheral_text)); // Clear the buffer
     char *p = peripheral_text;
     char *end = peripheral_text + sizeof(peripheral_text);
 
@@ -152,17 +152,17 @@ static void draw_battery_text(lv_obj_t *canvas, const struct status_state *state
         }
     }
     if (p > peripheral_text) {
-        *(p - 1) = '\0'; // Elimina el último espacio
+        *(p - 1) = '\0'; // Remove the trailing space
     }
     lv_canvas_draw_text(canvas, 0, 19, lv_obj_get_width(canvas), &label_dsc, peripheral_text);
 
 #else
-    // MODO 2 y 3 (el resto de los casos)
+    // MODES 2 and 3 (the remaining cases)
     char text[32];
-    memset(text, 0, sizeof(text)); // Limpia el búfer
+    memset(text, 0, sizeof(text)); // Clear the buffer
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_CENTRAL_SHOW_BATTERY_PERIPHERAL_ONLY)
-    // Muestra SÓLO las baterías de los periféricos
+    // Show ONLY the peripheral batteries
     char *p = text;
     char *end = text + sizeof(text);
     for (int i = 1; i < CONFIG_NICE_OLED_SPLIT_TOTAL_DEVICES; i++) {
@@ -175,7 +175,7 @@ static void draw_battery_text(lv_obj_t *canvas, const struct status_state *state
         *(p - 1) = '\0';
     }
 #elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_CENTRAL_SHOW_BATTERY_PERIPHERAL_AND_CENTRAL)
-    // Muestra la batería central y la del PRIMER periférico
+    // Show the central battery and the FIRST peripheral's
     if (CONFIG_NICE_OLED_SPLIT_TOTAL_DEVICES >= 2) {
         snprintf(text, sizeof(text), "%d %d", state->batteries[0].level, state->batteries[1].level);
     } else {
@@ -183,13 +183,13 @@ static void draw_battery_text(lv_obj_t *canvas, const struct status_state *state
     }
 #endif
 
-    // Dibuja la cadena de texto final para los modos 2 y 3
+    // Draw the final text string for modes 2 and 3
     lv_canvas_draw_text(canvas, 0, 19, lv_obj_get_width(canvas), &label_dsc, text);
 #endif
 }
 */
 
-//  FIN DE LA SECCIÓN REFACTORIZADA
+//  END OF REFACTORED SECTION
 #endif
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_LAYER)
@@ -201,9 +201,9 @@ static void draw_battery_text(lv_obj_t *canvas, const struct status_state *state
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
-//  Declaración adelantada (Forward Declaration) para draw_canvas
+//  Forward declaration for draw_canvas
 static void draw_canvas(lv_obj_t *widget, lv_color_t cbuf[], const struct status_state *state);
-//  Fin Declaración adelantada
+//  End forward declaration
 
 /**
  * sleep status
@@ -250,14 +250,14 @@ static struct zmk_widget_responsive_bongo_cat responsive_bongo_cat_widget;
 static struct zmk_widget_modifiers modifiers_widget;
 #endif
 
-//  INICIO SECCIÓN MODIFICADORES (NUEVA INTEGRACIÓN)
+//  BEGIN MODIFIERS SECTION
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED)
 
 struct mods_status_state {
     uint8_t mods;
 };
 
-// Declaraciones de imágenes de símbolos reales (de modifiers_270.c)
+// Declarations of the real symbol images (from modifiers_270.c)
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL)
 LV_IMG_DECLARE(control_0);
 LV_IMG_DECLARE(control_white_0);
@@ -272,8 +272,8 @@ LV_IMG_DECLARE(cmd_white_0);
 LV_IMG_DECLARE(win_0);
 LV_IMG_DECLARE(win_white_0);
 
-// Arrays de imágenes: [0] = normal, [1] = activo (blanco/invertido)
-// Orden: Control, Shift, Alt/Opt, Gui/Cmd/Win
+// Image arrays: [0] = normal, [1] = active (white/inverted)
+// Order: Control, Shift, Alt/Opt, Gui/Cmd/Win
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL_WINDOWS)
 // Windows: Control, Shift, Alt, Win
 static const lv_img_dsc_t *mod_imgs_normal[4] = {&control_0, &shift_0, &alt_0, &win_0};
@@ -285,23 +285,59 @@ static const lv_img_dsc_t *mod_imgs_active[4] = {&control_white_0, &shift_white_
 #endif
 #endif // CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL
 
-// Función de dibujo para los modificadores
+// Drawing function for the modifiers
 static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state) {
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL)
-    // --- MODO SÍMBOLOS (Imágenes reales) ---
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_WORDS)
+    // --- WORDS mode: held mods replace the layer name; GUI is not shown ---
+    // Order = bit order of zmk_hid_get_explicit_mods(): CTRL, SHIFT, ALT
+    static const char *words[3] = {"CTRL", "SHIFT", "ALT"};
+
+    int active[3];
+    int count = 0;
+    for (int i = 0; i < 3; i++) {
+        if ((state->mod_state >> i) & 1 || (state->mod_state >> (i + 4)) & 1) {
+            active[count++] = i;
+        }
+    }
+    if (count == 0) {
+        return; // no mods held: draw_canvas draws the layer name instead
+    }
+
+    if (count == 1) {
+        // same font and position as the layer name
+        lv_draw_label_dsc_t word_dsc;
+        init_label_dsc(&word_dsc, LVGL_FOREGROUND, &pixel_operator_mono_16,
+                       LV_TEXT_ALIGN_CENTER);
+        lv_canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_LAYER_CUSTOM_X,
+                            CONFIG_NICE_OLED_WIDGET_LAYER_CUSTOM_Y, 68, &word_dsc,
+                            words[active[0]]);
+    } else {
+        // several mods: stacked in the small font, anchored to the bottom edge
+        lv_draw_label_dsc_t word_dsc;
+        init_label_dsc(&word_dsc, LVGL_FOREGROUND, &lv_font_unscii_8, LV_TEXT_ALIGN_CENTER);
+        const int line_height = 9; // 8px font + 1px gap
+        int start_y = 160 - count * line_height;
+        for (int r = 0; r < count; r++) {
+            lv_canvas_draw_text(canvas, 0, start_y + r * line_height, 68, &word_dsc,
+                                words[active[r]]);
+        }
+    }
+
+#elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL)
+    // --- SYMBOL mode (real images) ---
     lv_draw_img_dsc_t img_dsc;
     lv_draw_img_dsc_init(&img_dsc);
 
-    // Las imágenes son 14x14 píxeles
+    // The images are 14x14 pixels
     const int img_size = 14;
     const int spacing = 2;
 
-    // Posición Base según tipo de pantalla y layout
+    // Base position depending on screen type and layout
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_VER)
-    // --- VERTICAL (Apilado) ---
+    // --- VERTICAL (stacked) ---
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_VER_ALIGN_RIGHT)
 #if IS_ENABLED(CONFIG_NICE_EPAPER_ON)
-    const int base_x = 68 - img_size - 2; // buena posicion para X vertical en right
+    const int base_x = 68 - img_size - 2; // good X position for vertical on the right
 #else
     const int base_x = 128 - img_size - 2;
 #endif
@@ -379,10 +415,10 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
 #endif
 
 #else
-    // --- MODO LETRAS (Texto) ---
+    // --- LETTERS mode (text) ---
     const char *items[4] = {"C", "S", "A", "G"};
 
-    // Descriptores de dibujo
+    // Draw descriptors
     lv_draw_rect_dsc_t rect_black_dsc;
     init_rect_dsc(&rect_black_dsc, LVGL_BACKGROUND);
     lv_draw_rect_dsc_t rect_white_dsc;
@@ -392,7 +428,7 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
     lv_draw_label_dsc_t mod_dsc_black;
     init_label_dsc(&mod_dsc_black, LVGL_BACKGROUND, &lv_font_unscii_8, LV_TEXT_ALIGN_CENTER);
 
-    // Dimensiones de caja
+    // Box dimensions
     const int box_width = 12;
     const int box_height = 14;
     const int inner_box_offset = 2;
@@ -400,9 +436,9 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
     const int inner_box_width = box_width - (2 * inner_box_offset);
     const int inner_box_height = box_height - (2 * inner_box_offset);
 
-    // Posición Base según tipo de pantalla y layout
+    // Base position depending on screen type and layout
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_VER)
-    // --- VERTICAL (Apilado) ---
+    // --- VERTICAL (stacked) ---
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_VER_ALIGN_RIGHT)
 #if IS_ENABLED(CONFIG_NICE_EPAPER_ON)
     const int base_x = 68 - box_width - 2;
@@ -507,47 +543,47 @@ static void draw_mods_status(lv_obj_t *canvas, const struct status_state *state)
 }
 
 #endif // IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED)
-//  FIN SECCIÓN MODIFICADORES (NUEVA INTEGRACIÓN)
+//  END MODIFIERS SECTION
 
-//  INICIO SECCIÓN LISTENER MODIFICADORES (NUEVA INTEGRACIÓN)
+//  BEGIN MODIFIERS LISTENER SECTION
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED)
 
-// Función para actualizar el estado del widget (adaptada al patrón existente)
+// Function to update the widget state (adapted to the existing pattern)
 static void set_mods_status(struct zmk_widget_screen *widget,
-                            struct mods_status_state state /* No usada directamente */) {
+                            struct mods_status_state state /* Not used directly */) {
 #if !IS_ENABLED(CONFIG_ZMK_SPLIT) || IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
-    // Obtiene el estado actual de los modificadores directamente
+    // Get the current modifier state directly
     widget->state.mod_state = zmk_hid_get_explicit_mods();
-    // Vuelve a dibujar todo el canvas para reflejar el cambio
+    // Redraw the whole canvas to reflect the change
     draw_canvas(widget->obj, widget->cbuf, &widget->state);
 #endif
 }
 
-// Callback que se llama cuando el estado necesita actualizarse
+// Callback invoked when the state needs updating
 static void mods_status_update_cb(struct mods_status_state state) {
     struct zmk_widget_screen *widget;
     SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) { set_mods_status(widget, state); }
 }
 
-// Función para obtener el estado (requerida por el listener)
+// Function to get the state (required by the listener)
 static struct mods_status_state mods_status_get_state(const zmk_event_t *eh) {
 #if !IS_ENABLED(CONFIG_ZMK_SPLIT) || IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
-    // No necesita devolver el estado real aquí porque set_mods_status lo obtiene
-    // Pero podríamos devolverlo si quisiéramos coherencia
+    // No need to return the real state here because set_mods_status fetches it
+    // But we could return it if we wanted consistency
     return (struct mods_status_state){.mods = zmk_hid_get_explicit_mods()};
 #else
-    return (struct mods_status_state){.mods = 0}; // Estado vacío para periférico
+    return (struct mods_status_state){.mods = 0}; // Empty state for peripheral
 #endif
 };
 
-// Registra el listener para el estado de los modificadores
+// Register the listener for the modifier state
 ZMK_DISPLAY_WIDGET_LISTENER(widget_mods_status, struct mods_status_state, mods_status_update_cb,
                             mods_status_get_state)
-// Se suscribe a los cambios de estado de las teclas (que pueden afectar a los modificadores)
+// Subscribe to key state changes (which may affect the modifiers)
 ZMK_SUBSCRIPTION(widget_mods_status, zmk_keycode_state_changed);
 
 #endif // IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED)
-//  FIN SECCIÓN LISTENER MODIFICADORES (NUEVA INTEGRACIÓN)
+//  END MODIFIERS LISTENER SECTION
 
 /**
  * raw hid
@@ -555,7 +591,7 @@ ZMK_SUBSCRIPTION(widget_mods_status, zmk_keycode_state_changed);
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID)
 
-// Función para dibujar el estado de Raw HID en el canvas principal
+// Function to draw the Raw HID state on the main canvas
 
 static void draw_hid_status(lv_obj_t *canvas, const struct status_state *state) {
 
@@ -592,7 +628,7 @@ static void draw_hid_status(lv_obj_t *canvas, const struct status_state *state) 
     init_label_dsc(&label_volume, LVGL_FOREGROUND, DRAW_HID_STATUS_FONTS,
                    DRAW_HID_STATUS_TEXT_ALIGN);
 
-    //  Área de dibujo - base position for fallback
+    //  Drawing area - base position for fallback
     int hid_area_x = CONFIG_NICE_OLED_WIDGET_RAW_HID_CUSTOM_X;
     int hid_area_y = CONFIG_NICE_OLED_WIDGET_RAW_HID_CUSTOM_Y;
 #if IS_ENABLED(CONFIG_NICE_EPAPER_ON)
@@ -601,18 +637,18 @@ static void draw_hid_status(lv_obj_t *canvas, const struct status_state *state) 
     int hid_area_width = 32;
 #endif // IS_ENABLED(CONFIG_NICE_EPAPER_ON)
 
-    // Variable para rastrear la posición Y actual (para "HID not found")
+    // Tracks the current Y position (for "HID not found")
     lv_coord_t current_y = hid_area_y;
-    // Variable para almacenar el tamaño del texto calculado
+    // Holds the computed text size
     lv_point_t text_size;
-    // Espacio vertical mínimo entre líneas (para "HID not found")
+    // Minimum vertical spacing between lines (for "HID not found")
     const lv_coord_t line_gap = 0;
 
     if (state->is_connected) {
-        char text_buffer[20]; // Buffer para formatear texto
+        char text_buffer[20]; // Buffer for formatting text
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_WEATHER)
-        // Dibujar Temperatura
+        // Draw temperature
         sprintf(text_buffer, "%dC", state->temperature);
         lv_canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_RAW_HID_WEATHER_CUSTOM_X,
                             CONFIG_NICE_OLED_WIDGET_RAW_HID_WEATHER_CUSTOM_Y,
@@ -620,14 +656,14 @@ static void draw_hid_status(lv_obj_t *canvas, const struct status_state *state) 
 #endif
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_TIME)
-        //  Dibujar Hora
+        //  Draw time
         sprintf(text_buffer, "%02i:%02i", state->hour, state->minute);
         lv_canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_RAW_HID_TIME_CUSTOM_X,
                             CONFIG_NICE_OLED_WIDGET_RAW_HID_TIME_CUSTOM_Y,
                             hid_area_width, &label_time, text_buffer);
 #endif
 
-        //  Dibujar Layout (condicional)
+        //  Draw layout (conditional)
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_LAYOUT)
         char layout_str[10] = {};
 #ifdef CONFIG_NICE_OLED_WIDGET_RAW_HID_LAYOUT_LIST
@@ -652,7 +688,7 @@ static void draw_hid_status(lv_obj_t *canvas, const struct status_state *state) 
                             hid_area_width, &label_layout, layout_str);
 #endif // CONFIG_NICE_OLED_WIDGET_RAW_HID_LAYOUT
 
-        //  Dibujar Volumen
+        //  Draw volume
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_VOLUME)
 #if IS_ENABLED(CONFIG_NICE_EPAPER_ON)
         sprintf(text_buffer, "Vol: %i", state->volume);
@@ -665,53 +701,53 @@ static void draw_hid_status(lv_obj_t *canvas, const struct status_state *state) 
 #endif
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS)
-        // Dibujar Spotify/Media Player
+        // Draw Spotify/media player
         lv_canvas_draw_text(canvas, CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_CUSTOM_X,
                             CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_CUSTOM_Y,
                             hid_area_width, &label_volume, state->media_player);
 #endif
 
     } else {
-        //  Dibuja mensaje "HID not found"
+        //  Draw "HID not found" message
 
-        // Dibujar "HID"
+        // Draw "HID"
         lv_txt_get_size(&text_size, "HID", label_time.font, label_time.letter_space,
                         label_time.line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
         lv_canvas_draw_text(canvas, hid_area_x, current_y, hid_area_width, &label_time, "HID");
         current_y += text_size.y + line_gap;
 
-        // Dibujar "not"
+        // Draw "not"
         lv_txt_get_size(&text_size, "not", label_layout.font, label_layout.letter_space,
                         label_layout.line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
         lv_canvas_draw_text(canvas, hid_area_x, current_y, hid_area_width, &label_layout, "not");
         current_y += text_size.y + line_gap;
 
-        // Dibujar "found"
+        // Draw "found"
         lv_txt_get_size(&text_size, "found", label_volume.font, label_volume.letter_space,
                         label_volume.line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
         lv_canvas_draw_text(canvas, hid_area_x, current_y, hid_area_width, &label_volume, "found");
     }
 }
 
-//  Listener para estado de conexión HID
+//  Listener for HID connection state
 static struct is_connected_notification get_is_hid_connected(const zmk_event_t *eh) {
-    // Esta función asume que el evento is_connected_notification existe y se puede extraer así.
-    // Verifica que as_is_connected_notification sea la forma correcta de obtener este evento.
+    // This function assumes the is_connected_notification event exists and can be extracted this way.
+    // Verify that as_is_connected_notification is the correct way to obtain this event.
     struct is_connected_notification *notification = as_is_connected_notification(eh);
     if (notification) {
         return *notification;
     }
-    // Devuelve un estado desconectado por defecto si el evento no es del tipo esperado
-    // o si el puntero es NULL (puede pasar durante la inicialización).
+    // Return a default disconnected state if the event is not of the expected type
+    // or the pointer is NULL (can happen during initialization).
     return (struct is_connected_notification){.value = false};
 }
 
 static void hid_is_connected_update_cb(struct is_connected_notification is_connected) {
-    // Actualiza el estado en *todos* los widgets de pantalla y redibuja
+    // Update the state in *all* screen widgets and redraw
     struct zmk_widget_screen *widget;
     SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) {
         widget->state.is_connected = is_connected.value;
-        // Llama a la función principal de dibujo para actualizar toda la pantalla
+        // Call the main drawing function to refresh the whole screen
         draw_canvas(widget->obj, widget->cbuf, &widget->state);
     }
 }
@@ -721,13 +757,13 @@ ZMK_DISPLAY_WIDGET_LISTENER(widget_is_connected, struct is_connected_notificatio
 ZMK_SUBSCRIPTION(widget_is_connected, is_connected_notification);
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_TIME)
-//  Listener para la hora
+//  Listener for the time
 static struct time_notification get_time(const zmk_event_t *eh) {
     struct time_notification *notification = as_time_notification(eh);
     if (notification) {
         return *notification;
     }
-    return (struct time_notification){.hour = 0, .minute = 0}; // Hora por defecto
+    return (struct time_notification){.hour = 0, .minute = 0}; // Default time
 }
 
 static void hid_time_update_cb(struct time_notification time) {
@@ -744,13 +780,13 @@ ZMK_SUBSCRIPTION(widget_time, time_notification);
 #endif
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_VOLUME)
-//  Listener para el volumen
+//  Listener for the volume
 static struct volume_notification get_volume(const zmk_event_t *eh) {
     struct volume_notification *notification = as_volume_notification(eh);
     if (notification) {
         return *notification;
     }
-    return (struct volume_notification){.value = 0}; // Volumen por defecto
+    return (struct volume_notification){.value = 0}; // Default volume
 }
 
 static void hid_volume_update_cb(struct volume_notification volume) {
@@ -766,14 +802,14 @@ ZMK_DISPLAY_WIDGET_LISTENER(widget_volume, struct volume_notification, hid_volum
 ZMK_SUBSCRIPTION(widget_volume, volume_notification);
 #endif
 
-#ifdef CONFIG_NICE_OLED_WIDGET_RAW_HID_LAYOUT // Reutiliza la Kconfig de status.c
+#ifdef CONFIG_NICE_OLED_WIDGET_RAW_HID_LAYOUT // Reuses the Kconfig from status.c
 
 static struct layout_notification get_layout(const zmk_event_t *eh) {
     struct layout_notification *notification = as_layout_notification(eh);
     if (notification) {
         return *notification;
     }
-    return (struct layout_notification){.value = 0}; // Layout por defecto
+    return (struct layout_notification){.value = 0}; // Default layout
 }
 
 static void hid_layout_update_cb(struct layout_notification layout) {
@@ -877,7 +913,14 @@ static void draw_canvas(lv_obj_t *widget, lv_color_t cbuf[], const struct status
 #endif // IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM)
     draw_profile_status(canvas, state);
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_LAYER)
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_WORDS)
+    // in WORDS mode active mods replace the layer name (GUI bits 0x88 ignored)
+    if ((state->mod_state & 0x77) == 0) {
+        draw_layer_status(canvas, state);
+    }
+#else
     draw_layer_status(canvas, state);
+#endif
 #endif
 
 #ifdef CONFIG_NICE_OLED_WIDGET_RAW_HID
@@ -886,9 +929,9 @@ static void draw_canvas(lv_obj_t *widget, lv_color_t cbuf[], const struct status
 #endif // CONFIG_NICE_OLED_WIDGET_RAW_HID
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED)
-    // Dibuja los modificadores si la nueva Kconfig está habilitada
+    // Draw the modifiers if the new Kconfig is enabled
     draw_mods_status(canvas, state);
-#endif // <-- NUEVO
+#endif // <-- NEW
 
     // Rotate for horizontal display
     rotate_canvas(canvas, cbuf);
@@ -1154,12 +1197,12 @@ int zmk_widget_screen_init(struct zmk_widget_screen *widget, lv_obj_t *parent) {
 #endif
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA)
-    zmk_widget_modifiers_init(&modifiers_widget, canvas); // Inicializar el widget de modifiers
+    zmk_widget_modifiers_init(&modifiers_widget, canvas); // Initialize the modifiers widget
 #endif
 
-#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED) // <-- NUEVO
-    widget_mods_status_init(); // <-- Inicializa el nuevo listener
-#endif                         // <-- NUEVO
+#if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED) // <-- NEW
+    widget_mods_status_init(); // <-- Initialize the new listener
+#endif                         // <-- NEW
 
 #ifdef CONFIG_NICE_OLED_WIDGET_RAW_HID
     widget_is_connected_init();
@@ -1179,23 +1222,23 @@ int zmk_widget_screen_init(struct zmk_widget_screen *widget, lv_obj_t *parent) {
     widget_spotify_status_init();
 #endif
 
-    // Inicializa el estado HID a "desconectado" para el primer dibujo
-    // Nota: Los valores iniciales (hora, vol, etc.) se obtendrán cuando lleguen los primeros
-    // eventos.
+    // Initialize the HID state to "disconnected" for the first draw
+    // Note: initial values (time, volume, etc.) will be obtained when the first
+    // events arrive.
     struct zmk_widget_screen *w;
     SYS_SLIST_FOR_EACH_CONTAINER(&widgets, w, node) {
-        w->state.is_connected = false; // Estado inicial por defecto
+        w->state.is_connected = false; // Default initial state
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_WEATHER)
-        w->state.temperature = 127; // Estado inicial para el clima (N/A)
+        w->state.temperature = 127; // Initial weather state (N/A)
 #endif
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_RAW_HID_MEDIA_PLAYER_SPOTIFY_MACOS)
         w->state.media_player[0] = '\0';
 #endif
-        // Otros campos HID se inicializarán a 0 o sus valores por defecto
+        // Other HID fields will initialize to 0 or their defaults
     }
 #endif // CONFIG_NICE_OLED_WIDGET_RAW_HID
 
-    // tiene que estar siempre al final por la sobre exposicion!!
+    // must always be last because of over-exposure!!
 #if IS_ENABLED(CONFIG_NICE_OLED_SHOW_SLEEP_ART_ON_IDLE) ||                                         \
     IS_ENABLED(CONFIG_NICE_OLED_SHOW_SLEEP_ART_ON_SLEEP)
     zmk_widget_sleep_status_init(&sleep_status_widget, canvas);

@@ -170,7 +170,7 @@ static void draw_needle(lv_obj_t *canvas, const struct status_state *state) {
 
     int centerX = CONFIG_NICE_OLED_WIDGET_WPM_NEEDLE_CENTER_CUSTOM_X;
     int centerY = CONFIG_NICE_OLED_WIDGET_WPM_NEEDLE_CENTER_CUSTOM_Y;
-    int offset = 5;   // 5 def, largo de la aguja
+    int offset = 5;   // 5 default, needle length
     int value = state->wpm[9];
 
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_WPM_GRAPH_FIXED_RANGE)
@@ -244,7 +244,7 @@ static void draw_graph(lv_obj_t *canvas, const struct status_state *state) {
             value = max;
         }
 
-        // modificar aqui par la posicion de la grafica
+        // modify here for the graph position
         points[i].x = -36 + i * 7.4;
         points[i].y = 127 - (value * 32 / max);
         // points[i].y = 132 - (value * 32 / max);

@@ -25,14 +25,14 @@ LV_IMG_DECLARE(sleep_oled);
 static void hide_and_restore_cb(lv_timer_t *timer) {
     lv_obj_t *art = (lv_obj_t *)timer->user_data;
     if (art) {
-// Restaura la imagen original que estaba en el estado activo
+// Restore the original image that was in the active state
 #if IS_ENABLED(CONFIG_NICE_EPAPER_ON)
         lv_img_set_src(art, &vim_68x160);
 #else
         lv_img_set_src(art, &vim_32x128);
 #endif
 
-        // Oculta el objeto, que es el comportamiento por defecto para el estado ACTIVO
+        // Hide the object, which is the default behavior for the ACTIVE state
         lv_obj_add_flag(art, LV_OBJ_FLAG_HIDDEN);
     }
 }
@@ -44,10 +44,10 @@ static void set_sleep_img(struct zmk_widget_sleep_status *widget,
         // TODO: START bootloader
     case ZMK_ACTIVITY_ACTIVE:
         LOG_DBG("ACTIVITY EVENT ACTIVE");
-        // Muestra temporalmente la imagen sleep_oled
+        // Temporarily show the sleep_oled image
         lv_img_set_src(widget->art, &sleep_oled);
         lv_obj_clear_flag(widget->art, LV_OBJ_FLAG_HIDDEN);
-        // Crea un temporizador para ocultarla y restaurar la original después de 3s
+        // Create a timer to hide it and restore the original after 3s
         lv_timer_create(hide_and_restore_cb, 3000, widget->art);
         break;
         // TODO: END bootloader

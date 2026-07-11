@@ -10,17 +10,17 @@
 #include <zephyr/kernel.h>
 #include "util.h"
 
-/* Widget de modificadores: ahora se utiliza un label para mostrar el estado en texto */
+/* Modifiers widget: now uses a label to show the state as text */
 struct zmk_widget_modifiers {
     sys_snode_t node;
     lv_obj_t *obj;
 };
 
 /**
- * Inicializa el widget de modificadores.
+ * Initializes the modifiers widget.
  *
- * @param widget Puntero a la estructura del widget.
- * @param parent Objeto padre de LVGL en el que se creará el widget.
- * @return 0 si la inicialización fue exitosa.
+ * @param widget Pointer to the widget structure.
+ * @param parent Parent LVGL object in which the widget is created.
+ * @return 0 on successful initialization.
  */
 int zmk_widget_modifiers_init(struct zmk_widget_modifiers *widget, lv_obj_t *parent);

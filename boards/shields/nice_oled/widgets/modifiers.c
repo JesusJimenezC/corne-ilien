@@ -24,15 +24,15 @@ struct modifiers_state {
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
 /**
- * Construye el string que representa los modificadores activos.
- * Se utiliza el siguiente mapeo:
+ * Builds the string representing the active modifiers.
+ * The following mapping is used:
  *   - Windows/Command (MOD_LGUI | MOD_RGUI) → "M"
  *   - Alt (MOD_LALT | MOD_RALT)              → "A"
  *   - Control (MOD_LCTL | MOD_RCTL)           → "C"
  *   - Shift (MOD_LSFT | MOD_RSFT)             → "S"
  *
- * @param label Objeto label de LVGL donde se mostrará el string.
- * @param state Estado de los modificadores.
+ * @param label LVGL label object where the string is shown.
+ * @param state Modifier state.
  */
 /* DEBUG
 static void set_modifiers_text(lv_obj_t *label, struct modifiers_state state) {
@@ -106,7 +106,7 @@ const lv_img_dsc_t *bongo_imgs_ctrl[] = {&bongo_cat_double_tap2_02, &bongo_cat_d
 // Shift: alternating taps
 const lv_img_dsc_t *bongo_imgs_shift[] = {&bongo_cat_double_tap1_03, &bongo_cat_double_tap2_02};
 
-static lv_obj_t *bongo_imgs = NULL; // Variable estática para almacenar el objeto animado
+static lv_obj_t *bongo_imgs = NULL; // Static variable holding the animated object
 #define MODIFIERS_USE_BONGO_CAT 1
 
 #elif IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_LUNA)
@@ -125,7 +125,7 @@ const lv_img_dsc_t *luna_imgs_walk_90[] = {&dog_walk1_90, &dog_walk2_90};
 const lv_img_dsc_t *luna_imgs_run_90[] = {&dog_run1_90, &dog_run2_90};
 const lv_img_dsc_t *luna_imgs_sneak_90[] = {&dog_sneak1_90, &dog_sneak2_90};
 
-static lv_obj_t *luna_imgs = NULL; // Variable estática para almacenar el objeto animado
+static lv_obj_t *luna_imgs = NULL; // Static variable holding the animated object
 #define MODIFIERS_USE_LUNA 1
 
 #else
@@ -136,20 +136,20 @@ static lv_obj_t *luna_imgs = NULL; // Variable estática para almacenar el objet
 
 static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) {
     uint8_t mods = zmk_hid_get_explicit_mods();
-    /* Limpiamos el texto del label, ya que se usarán imágenes fijas */
+    /* Clear the label text, since fixed images will be used */
     lv_label_set_text(label, "");
 
 #if defined(MODIFIERS_USE_SYMBOLS)
     //     lv_canvas_draw_img(canvas, 45, 2, &usb, &img_dsc);
 
-    /* Definición de variables estáticas para cada imagen fija */
+    /* Static variables for each fixed image */
     static lv_obj_t *fixed_win = NULL;
     static lv_obj_t *fixed_alt = NULL;
     static lv_obj_t *fixed_ctl = NULL;
     static lv_obj_t *fixed_shf = NULL;
 
-    /* Creación de los objetos de imagen (si aún no existen) */
-    // Offset base para posicionamiento vertical de símbolos
+    /* Create the image objects (if they don't exist yet) */
+    // Base offset for vertical symbol positioning
     const int base_x = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_X;
     const int base_y = CONFIG_NICE_OLED_WIDGET_MODIFIERS_CUSTOM_Y;
 
@@ -174,14 +174,14 @@ static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) 
         lv_img_set_src(fixed_win, symbol_imgs_win[0]);
     }
 
-    /* Actualizar la fuente de cada imagen según el estado de cada modificador */
+    /* Update each image source according to each modifier's state */
 #if IS_ENABLED(CONFIG_NICE_OLED_WIDGET_MODIFIERS_INDICATORS_FIXED_SYMBOL_WINDOWS)
-    /* Para Windows/Command: si alguno de los mods está activo, usar la imagen blanca */
+    /* For Windows/Command: if either mod is active, use the white image */
     lv_img_set_src(fixed_win,
                    (mods & (MOD_LGUI | MOD_RGUI)) ? symbol_imgs_win[1] : symbol_imgs_win[0]);
 #else
-    /* En caso de no usar la opción WINDOWS, se aplicaría la lógica correspondiente (por ejemplo con
-     * symbol_imgs_win definidas como cmd) */
+    /* When the WINDOWS option is not used, the corresponding logic applies (e.g. with
+     * symbol_imgs_win defined as cmd) */
     lv_img_set_src(fixed_win,
                    (mods & (MOD_LGUI | MOD_RGUI)) ? symbol_imgs_win[1] : symbol_imgs_win[0]);
 #endif
@@ -194,7 +194,7 @@ static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) 
                    (mods & (MOD_LSFT | MOD_RSFT)) ? symbol_imgs_shift[1] : symbol_imgs_shift[0]);
 
 #elif defined(MODIFIERS_USE_BONGO_CAT)
-    /* En modo "bongo cat" se utiliza la lógica de animación */
+    /* In "bongo cat" mode the animation logic is used */
     if (mods & (MOD_LGUI | MOD_RGUI)) {
         if (!bongo_imgs) {
             bongo_imgs = lv_animimg_create(label);
@@ -247,7 +247,7 @@ static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) 
     }
 
 #elif defined(MODIFIERS_USE_LUNA)
-    /* En modo "luna" se utiliza la lógica de animación ya existente */
+    /* In "luna" mode the existing animation logic is used */
     if (mods & (MOD_LGUI | MOD_RGUI)) {
         if (!luna_imgs) {
             luna_imgs = lv_animimg_create(label);
@@ -307,7 +307,7 @@ static void set_modifiers_text(lv_obj_t *label, struct modifiers_state ignored) 
 }
 
 /**
- * Callback de actualización del widget, se invoca al cambiar el estado de los modificadores.
+ * Widget update callback, invoked when the modifier state changes.
  */
 static void modifiers_update_cb(struct modifiers_state state) {
     struct zmk_widget_modifiers *widget;
@@ -315,27 +315,27 @@ static void modifiers_update_cb(struct modifiers_state state) {
 }
 
 /**
- * Obtiene el estado actual de los modificadores.
+ * Gets the current modifier state.
  *
- * @param eh Evento de ZMK.
- * @return Estructura con el estado de los modificadores.
+ * @param eh ZMK event.
+ * @return Structure with the modifier state.
  */
 static struct modifiers_state modifiers_get_state(const zmk_event_t *eh) {
     return (struct modifiers_state){.modifiers = zmk_hid_get_explicit_mods()};
 }
 
-/* Registra el listener para actualizar el widget cuando cambie el estado de los modificadores */
+/* Register the listener to update the widget when the modifier state changes */
 ZMK_DISPLAY_WIDGET_LISTENER(widget_modifiers, struct modifiers_state, modifiers_update_cb,
                             modifiers_get_state)
 ZMK_SUBSCRIPTION(widget_modifiers, zmk_keycode_state_changed);
 
 /**
- * Inicializa el widget de modificadores.
- * Se crea un label que mostrará el texto con los modificadores activos.
+ * Initializes the modifiers widget.
+ * Creates a label that will show the active modifiers as text.
  *
- * @param widget Puntero a la estructura del widget.
- * @param parent Objeto padre de LVGL en el que se creará el label.
- * @return 0 si la inicialización fue exitosa.
+ * @param widget Pointer to the widget structure.
+ * @param parent Parent LVGL object in which the label is created.
+ * @return 0 on successful initialization.
  */
 int zmk_widget_modifiers_init(struct zmk_widget_modifiers *widget, lv_obj_t *parent) {
     widget->obj = lv_label_create(parent);
